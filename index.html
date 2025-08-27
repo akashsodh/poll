@@ -606,7 +606,7 @@
         const submittedMessage = document.getElementById('submittedMessage');
 
         // Check if user has already submitted on page load
-        if (localStorage.getItem('hasSubmitted') === 'true') {
+        if (localStorage.getItem('hasSubmitted_v2') === 'true') {
             document.getElementById('marksForm').style.display = 'none';
             submittedMessage.style.display = 'block';
         }
@@ -695,26 +695,27 @@
             submitBtn.textContent = 'सबमिट हो रहा है...';
 
             try {
-                // Check if the roll number already exists
-                const existingStudent = await studentsCollection.where('rollNumber', '==', rollNumber).get();
-                if (!existingStudent.empty) {
-                    mainErrorMessage.textContent = 'यह रोल नंबर पहले से ही दर्ज है।';
-                    mainErrorMessage.style.display = 'block';
-                    return;
-                }
+                const existingStudentQuery = await studentsCollection.where('rollNumber', '==', rollNumber).get();
 
-                await studentsCollection.add(studentData);
+                if (!existingStudentQuery.empty) {
+                    // If student exists, update their data
+                    const studentDocId = existingStudentQuery.docs[0].id;
+                    await studentsCollection.doc(studentDocId).update(studentData);
+                } else {
+                    // If new student, add their data
+                    await studentsCollection.add(studentData);
+                }
                 
                 // Save roll number to localStorage and show success message
                 myRollNumber = rollNumber;
                 localStorage.setItem('myRollNumber', myRollNumber);
-                localStorage.setItem('hasSubmitted', 'true');
+                localStorage.setItem('hasSubmitted_v2', 'true');
                 
                 document.getElementById('finalScore').textContent = totalMarks.toFixed(2);
                 scoreModal.style.display = 'block';
 
             } catch (error) {
-                console.error("Error adding document: ", error);
+                console.error("Error adding/updating document: ", error);
                 mainErrorMessage.textContent = 'डेटा सबमिट करने में त्रुटि हुई।';
                 mainErrorMessage.style.display = 'block';
             } finally {
