@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian Grade-III</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #17a2b8;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --text-color: #495057;
+            --bg-color: #eef2f5;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: 'Kokila', 'Tiro Devanagari Hindi', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 25px 35px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 850px;
+            box-sizing: border-box;
+            border-top: 4px solid var(--primary-color);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out; 
+        }
+        .container.is-visible, .telegram-banner.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .telegram-banner {
+            width: 100%;
+            max-width: 850px;
+            background-color: #0088cc;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            border-radius: 12px;
+            box-sizing: border-box;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .telegram-banner a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        h1, h2, h3 {
+            color: var(--dark-color);
+            text-align: center;
+            margin-top: 0;
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+        
+        h3.no-border {
+             border-bottom: none;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;            font-family: 'Kokila', 'Tiro Devanagari Hindi', sans-serif;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+        }
+        
+        button#submitBtn {
+            background-color: var(--primary-color);
+            color: #fff;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        #exportBtn {
+            background-color: var(--warning-color);
+            color: var(--dark-color);
+        }
+
+        #exportBtn:hover:not(:disabled) {
+            background-color: #e0a800;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: center;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s ease-in-out;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: var(--light-color);
+        }
+
+        tbody tr:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .info-box {
+            text-align: center;
+            font-size: 1.1rem;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid;
+            background-color: #eef7ff;
+            border-color: #a7d1fb;
+        }
+
+        .info-box h3 {
+             color: #0056b3;
+             border-bottom: none;
+             margin: 0 0 15px 0;
+             font-size: 1.5rem;
+        }
+
+        .info-box p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            text-align: center;
+            margin: 0;
+        }
+        
+        .success-message {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--success-color);
+            font-weight: 600;
+            padding: 15px;
+            background-color: #e6f7e9;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--danger-color);
+            font-weight: 600;
+            padding: 15px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .animated-warning {
+            background-color: #fff5f5;
+            border: 1px solid #fcc2c2;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--danger-color);
+            font-weight: 600;
+            text-align: center;
+            animation: text-glow 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes text-glow {
+            from {
+                text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px var(--danger-color);
+            }
+            to {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px var(--danger-color);
+            }
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: var(--light-color);
+        }
+        
+        /* --- NEW STYLES FOR NOTIFY ME SECTION --- */
+        .notify-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #cce4ff;
+        }
+        .notify-section .notify-heading {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--dark-color);
+            margin-bottom: 15px;
+        }
+        #notifyForm {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        #notifyForm input {
+            flex-grow: 1;
+        }
+        #notifyBtn {
+            background-color: var(--success-color);
+            flex-shrink: 0;
+        }
+        #notifyMessage {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        @media (max-width: 480px) {
+            #notifyForm {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        /* --- END OF NEW STYLES --- */
+        
+        .flex-group {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        .flex-group .form-group {
+            flex: 1;
+        }
+
+        .roll-number-container {
+            position: relative;
+        }
+        
+        #roll-number-error {
+            color: var(--danger-color);
+            font-size: 0.8rem;
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            display: none;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s;
+            animation: fadeIn 0.4s ease-out;
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 15% auto;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            animation: modal-swoop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes modal-swoop-in {
+            from { opacity: 0; transform: scale(0.8) translateY(-100px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-content h3 {
+            color: var(--success-color);
+        }
+        
+        .close-btn {
+            color: var(--dark-color);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover, .close-btn:focus {
+            color: #000;
+        }
+        
+        .highlighted-row {
+            background-color: var(--success-color) !important;
+            color: white;
+            font-weight: bold;
+            border-color: var(--success-color) !important;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        #pagination-wrapper {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+        .page-btn {
+            background-color: var(--primary-color);
+        }
+        .page-btn:hover:not(:disabled) {
+            background-color: #00418a;
+        }
+
+
+        @media (max-width: 768px) {
+            body { padding: 10px; gap: 20px; }
+            .container { padding: 20px; }
+            h2 { font-size: 1.5rem; }
+            h3 { font-size: 1.2rem; }
+            .flex-group {
+                flex-direction: column;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="telegram-banner">
+        <a href="https://t.me/LibrarianCutOff" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-telegram-plane"></i> नवीनतम अपडेट के लिए हमारे टेलीग्राम चैनल से जुड़ें!
+        </a>
+    </div>
+
+    <div class="container">
+        <h2>Librarian Grade -III 2025 <br>Cut-Off Analysis 🚀</h2>
+        
+        <div id="form-container">
+            <form id="marksForm">
+                <h4 class="animated-warning">📢 ध्यान दे :- <br>एक बार सबमिट करने के बाद आप इसे Edit नही कर पाएंगे <br> इसलिए कृपया ईमानदारी से अपने अंक दर्ज करें <br> इतनी जानकारी आपसे इसलिए भरवाई जा रही है ताकि कोई गलत जानकारी नही भरे </h4>
+                <div class="error-message" id="errorMessage"></div>
+
+                
+                <div class="form-group roll-number-container">
+                    <label for="rollNumber">रोल नंबर:</label>
+                    <input type="tel" id="rollNumber" placeholder="अपना सही रोल नंबर दर्ज करें" required>
+                    <span id="roll-number-error">अमान्य रोल नंबर।</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="studentName">आपका नाम:</label>
+                    <input type="text" id="studentName" placeholder="अपना नाम दर्ज करें" required>
+                </div>
+                
+                <h4 style="text-align: left; margin: 20px 0 10px 0; font-weight: 600; color: var(--dark-color);">Paper 1 (Total Questions: 100)</h4>
+                <div class="flex-group">
+                    <div class="form-group">
+                        <label for="paper1Correct">सही प्रश्नों की संख्या:</label>
+                        <input type="number" id="paper1Correct" placeholder="Paper 1 में आपके कितने प्रश्न सही हुए" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paper1Incorrect">गलत प्रश्नों की संख्या:</label>
+                        <input type="number" id="paper1Incorrect" placeholder="Paper 1 में आपके कितने प्रश्न गलत हुए" min="0" max="100" required>
+                    </div>
+                </div>
+
+                <h4 style="text-align: left; margin: 20px 0 10px 0; font-weight: 600; color: var(--dark-color);">Paper 2 (Total Questions: 100)</h4>
+                <div class="flex-group">
+                    <div class="form-group">
+                        <label for="paper2Correct">सही प्रश्नों की संख्या:</label>
+                        <input type="number" id="paper2Correct" placeholder="Paper 2 में आपके कितने प्रश्न सही हुए" min="0" max="100" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="paper2Incorrect">गलत प्रश्नों की संख्या:</label>
+                        <input type="number" id="paper2Incorrect" placeholder="Paper 2 में आपके कितने प्रश्न गलत हुए" min="0" max="100" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select id="category" required>
+                        <option value="">Choose Category</option>
+                        <option value="GENERAL">GENERAL</option>
+                        <option value="OBC">OBC</option>
+                        <option value="EWS">EWS</option>
+                        <option value="MBC">MBC</option>
+                        <option value="SC">SC</option>
+                        <option value="ST">ST</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="area">Area:</label>
+                    <select id="area" required>
+                        <option value="">Choose Area</option>
+                        <option value="TSP">TSP</option>
+                        <option value="NON TSP">NON TSP</option>
+                    </select>
+                </div>
+                
+                <button type="submit" id="submitBtn"><i class="fas fa-paper-plane"></i>Submit</button>
+            </form>
+            
+            <div id="submittedMessage" style="text-align:center; display:none; padding: 25px;">
+                <h3 style="color:var(--success-color); border-bottom: none;">✅ आपने पहले ही अपना डेटा सबमिट कर दिया है!</h3>
+                <p>आपके सबमिट किए गए डेटा को नीचे की तालिका में सबसे ऊपर दिखाया गया है।</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Pop-up Modal -->
+    <div id="scoreModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>✅ डेटा सफलतापूर्वक सबमिट हो गया है!</h3>
+            <p>आपका कुल स्कोर:</p>
+            <p id="finalScore" style="font-size: 2.5rem; font-weight: 700; color: var(--success-color); margin: 10px 0;"></p>
+            <button onclick="closeModal()" style="background-color: var(--primary-color);">जारी रखें</button>
+        </div>
+    </div>
+    
+    <div class="container" style="text-align: center;">
+        <h3 class="no-border">📝अब तक कुल पंजीकृत अभ्यर्थी</h3>
+        <p id="total-students-counter" style="font-size: 2.5rem; font-weight: 700; color: var(--primary-color); margin: 0;">0</p>
+    </div>
+
+    <div class="container">
+        <h3>📊 LIVE ANALYSIS CHART</h3>
+        <div class="chart-container">
+            <canvas id="marksDistributionChart"></canvas>
+        </div>
+    </div>
+
+    <div class="container">
+        <h3>📈 CATAGORY WISE CUT-OFF ANALYSIS</h3>
+        <div class="table-wrapper">
+             <table id="cutoffTable"><thead><tr><th>श्रेणी</th><th>उम्मीदवार</th><th>औसत अंक</th><th>सर्वोच्च अंक</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            <h3>👥 All Student's Data</h3>
+            <button id="exportBtn"><i class="fas fa-download"></i> Download Report</button>
+        </div>
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>रैंक (Overall)</th>
+                        <th>रैंक (Category)</th>
+                        <th>रोल नंबर</th>
+                        <th>कुल अंक</th>
+                        <th>श्रेणी</th>
+                        <th>क्षेत्र</th>
+                    </tr>
+                </thead>
+                <tbody id="userEntryBody"></tbody>
+                <tbody id="otherEntriesBody"></tbody>
+            </table>
+        </div>
+        <div id="pagination-wrapper"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- Firebase कॉन्फ़िगरेशन ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDHe8N3RzI5kIDg2qmHc4VtmnNpyv_XNM",
+            authDomain: "akashsodh-libra.firebaseapp.com",
+            projectId: "akashsodh-libra",
+            storageBucket: "akashsodh-libra.firebasestorage.app",
+            messagingSenderId: "25252360194",
+            appId: "1:25252360194:web:5546d30f768c4ca2b0771b",
+            measurementId: "G-NP7BSMH4WF"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const studentsCollection = db.collection('students');
+        
+        let allStudentsData = [], processedStudentsData = [];
+        let marksDistributionChart;
+        let currentPage = 1;
+        const rowsPerPage = 1000;
+        let myRollNumber = localStorage.getItem('myRollNumber');
+        const formContainer = document.getElementById('form-container');
+        const submittedMessage = document.getElementById('submittedMessage');
+
+        // Check if user has already submitted on page load
+        if (localStorage.getItem('hasSubmitted') === 'true') {
+            document.getElementById('marksForm').style.display = 'none';
+            submittedMessage.style.display = 'block';
+        }
+
+        const scoreModal = document.getElementById('scoreModal');
+
+
+        // --- Handle form submission with roll number validation ---
+        const form = document.getElementById('marksForm');
+        const rollNumberInput = document.getElementById('rollNumber');
+        const rollNumberError = document.getElementById('roll-number-error');
+
+        // Live validation for roll number input
+        rollNumberInput.addEventListener('input', () => {
+            const rollNumber = rollNumberInput.value.trim();
+            const rollNumberInt = parseInt(rollNumber);
+
+            if (rollNumber.length !== 6 || isNaN(rollNumberInt) || rollNumberInt < 800000 || rollNumberInt > 900000) {
+                rollNumberInput.style.borderColor = 'var(--danger-color)';
+                rollNumberError.style.display = 'block';
+            } else {
+                rollNumberInput.style.borderColor = 'var(--border-color)';
+                rollNumberError.style.display = 'none';
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const mainErrorMessage = document.getElementById('errorMessage');
+            mainErrorMessage.style.display = 'none';
+
+            const rollNumber = rollNumberInput.value.trim();
+            const rollNumberInt = parseInt(rollNumber);
+            
+            // Validate roll number on submit
+            if (rollNumber.length !== 6 || isNaN(rollNumberInt) || rollNumberInt < 800000 || rollNumberInt > 900000) {
+                mainErrorMessage.textContent = 'अमान्य रोल नंबर। कृपया अपना 6 अंकों का सही रोल नंबर दर्ज करें।';
+                mainErrorMessage.style.display = 'block';
+                return;
+            }
+            
+            const studentName = document.getElementById('studentName').value.trim();
+            const paper1Correct = parseInt(document.getElementById('paper1Correct').value) || 0;
+            const paper1Incorrect = parseInt(document.getElementById('paper1Incorrect').value) || 0;
+            const paper2Correct = parseInt(document.getElementById('paper2Correct').value) || 0;
+            const paper2Incorrect = parseInt(document.getElementById('paper2Incorrect').value) || 0;
+            const category = document.getElementById('category').value;
+            const area = document.getElementById('area').value;
+            
+            // Validate total questions for Paper 1
+            if (paper1Correct + paper1Incorrect > 100) {
+                mainErrorMessage.textContent = 'पेपर 1 में सही और गलत प्रश्नों की कुल संख्या 100 से अधिक नहीं हो सकती।';
+                mainErrorMessage.style.display = 'block';
+                return;
+            }
+
+            // Validate total questions for Paper 2
+            if (paper2Correct + paper2Incorrect > 100) {
+                mainErrorMessage.textContent = 'पेपर 2 में सही और गलत प्रश्नों की कुल संख्या 100 से अधिक नहीं हो सकती।';
+                mainErrorMessage.style.display = 'block';
+                return;
+            }
+            
+            // Calculate total marks with 1/3 negative marking
+            const paper1Marks = (paper1Correct * 2) - (paper1Incorrect * (2/3));
+            const paper2Marks = (paper2Correct * 2) - (paper2Incorrect * (2/3));
+            const totalMarks = Math.max(0, paper1Marks + paper2Marks);
+
+            const studentData = {
+                rollNumber,
+                name: studentName,
+                paper1: paper1Marks.toFixed(2), // Store calculated marks
+                paper2: paper2Marks.toFixed(2), // Store calculated marks
+                totalMarks: totalMarks.toFixed(2),
+                correct1: paper1Correct,
+                incorrect1: paper1Incorrect,
+                correct2: paper2Correct,
+                incorrect2: paper2Incorrect,
+                category,
+                area,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'सबमिट हो रहा है...';
+
+            try {
+                // Check if the roll number already exists
+                const existingStudent = await studentsCollection.where('rollNumber', '==', rollNumber).get();
+                if (!existingStudent.empty) {
+                    mainErrorMessage.textContent = 'यह रोल नंबर पहले से ही दर्ज है।';
+                    mainErrorMessage.style.display = 'block';
+                    return;
+                }
+
+                await studentsCollection.add(studentData);
+                
+                // Save roll number to localStorage and show success message
+                myRollNumber = rollNumber;
+                localStorage.setItem('myRollNumber', myRollNumber);
+                localStorage.setItem('hasSubmitted', 'true');
+                
+                document.getElementById('finalScore').textContent = totalMarks.toFixed(2);
+                scoreModal.style.display = 'block';
+
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                mainErrorMessage.textContent = 'डेटा सबमिट करने में त्रुटि हुई।';
+                mainErrorMessage.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'अपना डेटा सबमिट करें';
+            }
+        });
+
+        document.getElementById('exportBtn').addEventListener('click', () => {
+            let csvContent = "data:text/csv;charset=utf-8,Overall Rank,Category Rank,रोल नंबर,सही प्रश्न (पेपर 1),गलत प्रश्न (पेपर 1),सही प्रश्न (पेपर 2),गलत प्रश्न (पेपर 2),कुल अंक,श्रेणी,क्षेत्र\n";
+            processedStudentsData.forEach(row => {
+                const rollNumber = row.rollNumber || 'N/A';
+                csvContent += `${row.overallRank},${row.categoryRank},${rollNumber},${row.correct1},${row.incorrect1},${row.correct2},${row.incorrect2},${row.totalMarks},${row.category},${row.area}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "librarian_marks_data_with_ranks.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // Modal functions
+        function closeModal() {
+            scoreModal.style.display = 'none';
+            document.getElementById('marksForm').style.display = 'none';
+            submittedMessage.style.display = 'block';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == scoreModal) {
+                closeModal();
+            }
+        }
+        
+        function animateCounter(el, to) {
+            let from = parseInt(el.innerText.replace(/,/g, '')) || 0;
+            if (from === to) return;
+            
+            const duration = 1500; // ms
+            const frameDuration = 1000 / 60; // 60fps
+            const totalFrames = Math.round(duration / frameDuration);
+            const easeOutQuad = t => t * (2 - t);
+            
+            let frame = 0;
+            const count = () => {
+                frame++;
+                const progress = easeOutQuad(frame / totalFrames);
+                const current = Math.round(from + (to - from) * progress);
+                el.innerText = current.toLocaleString('en-IN');
+
+                if (frame < totalFrames) {
+                    requestAnimationFrame(count);
+                } else {
+                    el.innerText = to.toLocaleString('en-IN');
+                }
+            };
+            requestAnimationFrame(count);
+        }
+
+        studentsCollection.orderBy('totalMarks', 'desc').onSnapshot(snapshot => {
+            allStudentsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            const counterElement = document.getElementById('total-students-counter');
+            animateCounter(counterElement, allStudentsData.length);
+            
+            processAndDisplayData(allStudentsData);
+            updateCutoffTable(allStudentsData);
+            updateCharts(allStudentsData);
+
+        }, error => {
+            console.error("Firestore से डेटा प्राप्त करने में त्रुटि: ", error);
+        });
+        
+        function processAndDisplayData(data) {
+            let rank = 0, lastMarks = -1;
+            data.forEach((student, index) => {
+                if (student.totalMarks !== lastMarks) rank = index + 1;
+                student.overallRank = rank;
+                lastMarks = student.totalMarks;
+            });
+
+            const categoryGroups = {};
+            data.forEach(student => {
+                const key = `${student.category} - ${student.area}`;
+                if (!categoryGroups[key]) categoryGroups[key] = [];
+                categoryGroups[key].push(student);
+            });
+
+            for (const key in categoryGroups) {
+                const group = categoryGroups[key];
+                let categoryRank = 0, lastCategoryMarks = -1;
+                group.forEach((student, index) => {
+                    if (student.totalMarks !== lastCategoryMarks) categoryRank = index + 1;
+                    student.categoryRank = categoryRank;
+                    lastCategoryMarks = student.totalMarks;
+                });
+            }
+            
+            processedStudentsData = data;
+            if ((currentPage - 1) * rowsPerPage >= processedStudentsData.length) currentPage = 1;
+            displayPage(processedStudentsData);
+        }
+
+        function displayPage(data) {
+            updateDataTable(data);
+            setupPagination(data);
+        }
+
+        function updateDataTable(data) {
+            const userEntryBody = document.getElementById('userEntryBody');
+            const otherEntriesBody = document.getElementById('otherEntriesBody');
+            userEntryBody.innerHTML = '';
+            otherEntriesBody.innerHTML = '';
+
+            let userFound = false;
+            
+            // Find and display user's data separately
+            if (myRollNumber) {
+                const myData = data.find(student => student.rollNumber === myRollNumber);
+                if (myData) {
+                    const newRow = userEntryBody.insertRow();
+                    newRow.classList.add('highlighted-row');
+                    newRow.innerHTML = `<td><strong>${myData.overallRank}</strong></td><td>${myData.categoryRank}</td><td>${myData.rollNumber}</td><td><strong>${myData.totalMarks}</strong></td><td>${myData.category}</td><td>${myData.area}</td>`;
+                    userFound = true;
+                }
+            }
+            
+            // Display other students' data
+            const startIndex = (currentPage - 1) * rowsPerPage;
+            const endIndex = startIndex + rowsPerPage;
+            const paginatedItems = data.slice(startIndex, endIndex);
+
+            paginatedItems.forEach(student => {
+                // Skip user's own entry if already displayed
+                if (userFound && student.rollNumber === myRollNumber) {
+                    return;
+                }
+                const newRow = otherEntriesBody.insertRow();
+                newRow.innerHTML = `<td><strong>${student.overallRank}</strong></td><td>${student.categoryRank}</td><td>${student.rollNumber || 'N/A'}</td><td><strong>${student.totalMarks}</strong></td><td>${student.category}</td><td>${student.area}</td>`;
+            });
+        }
+
+        function setupPagination(data) {
+            const paginationWrapper = document.getElementById('pagination-wrapper');
+            paginationWrapper.innerHTML = '';
+            if (data.length <= rowsPerPage) return;
+
+            const pageCount = Math.ceil(data.length / rowsPerPage);
+
+            const prevButton = document.createElement('button');
+            prevButton.classList.add('page-btn');
+            prevButton.innerHTML = '<i class="fas fa-arrow-left"></i> पिछला';
+            prevButton.disabled = currentPage === 1;
+            prevButton.addEventListener('click', () => {
+                currentPage--;
+                displayPage(data);
+            });
+            paginationWrapper.appendChild(prevButton);
+
+            const pageInfo = document.createElement('span');
+            pageInfo.style.margin = '0 10px';
+            pageInfo.innerText = `पेज ${currentPage} / ${pageCount}`;
+            paginationWrapper.appendChild(pageInfo);
+            
+            const nextButton = document.createElement('button');
+            nextButton.classList.add('page-btn');
+            nextButton.innerHTML = 'अगला <i class="fas fa-arrow-right"></i>';
+            nextButton.disabled = currentPage === pageCount;
+            nextButton.addEventListener('click', () => {
+                currentPage++;
+                displayPage(data);
+            });
+            paginationWrapper.appendChild(nextButton);
+        }
+
+        function updateCharts(data) {
+            const marksRanges = {};
+            const ranges = ['200-210', '211-220', '221-230', '231-240', '241-250', '251-260', '261-270', '271-280', '281+'];
+            ranges.forEach(r => marksRanges[r] = 0);
+            
+            data.forEach(student => {
+                const tm = parseFloat(student.totalMarks);
+                if (tm <= 210) marksRanges['200-210']++;
+                else if (tm <= 220) marksRanges['211-220']++;
+                else if (tm <= 230) marksRanges['221-230']++;
+                else if (tm <= 240) marksRanges['231-240']++;
+                else if (tm <= 250) marksRanges['241-250']++;
+                else if (tm <= 260) marksRanges['251-260']++;
+                else if (tm <= 270) marksRanges['261-270']++;
+                else if (tm <= 280) marksRanges['271-280']++;
+                else marksRanges['281+']++;
+            });
+
+            const chart1Ctx = document.getElementById('marksDistributionChart').getContext('2d');
+            if (marksDistributionChart) marksDistributionChart.destroy();
+            marksDistributionChart = new Chart(chart1Ctx, { type: 'bar', data: { labels: Object.keys(marksRanges), datasets: [{ label: 'छात्रों की संख्या', data: Object.values(marksRanges), backgroundColor: 'rgba(0, 86, 179, 0.7)' }] }, options: { responsive: true, plugins: { title: { display: true, text: 'अंक वितरण (Marks Distribution)', font: { size: 16, family: "'Kokila', 'Tiro Devanagari Hindi', sans-serif" } } }, scales: { y: { beginAtZero: true } } } });
+            
+        }
+        
+        function updateCutoffTable(data) {
+            const cutoffTableBody = document.getElementById('cutoffTable').getElementsByTagName('tbody')[0];
+            const categoryStats = getCategoryStats(data);
+            cutoffTableBody.innerHTML = '';
+            for (const key in categoryStats) {
+                const stats = categoryStats[key];
+                const newRow = cutoffTableBody.insertRow();
+                newRow.innerHTML = `<td>${key}</td><td>${stats.count}</td><td>${stats.average.toFixed(2)}</td><td>${stats.highest}</td>`;
+            }
+        }
+        
+        function getCategoryStats(data) {
+            const groupedData = {};
+            data.forEach(student => {
+                const key = `${student.category} - ${student.area}`;
+                if (!groupedData[key]) groupedData[key] = [];
+                groupedData[key].push(parseFloat(student.totalMarks));
+            });
+            const categoryStats = {};
+            for (const key in groupedData) {
+                const marks = groupedData[key].sort((a, b) => a - b);
+                if(marks.length === 0) continue;
+                const sum = marks.reduce((acc, val) => acc + val, 0);
+                const mid = Math.floor(marks.length / 2);
+                const median = marks.length % 2 !== 0 ? marks[mid] : (marks[mid - 1] + marks[mid]) / 2;
+                categoryStats[key] = { count: marks.length, average: sum / marks.length, median: median, highest: marks[marks.length - 1] };
+            }
+            return categoryStats;
+        }
+
+        // --- Animation on Scroll ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.container, .telegram-banner');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            animatedElements.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
